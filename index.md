@@ -36,7 +36,7 @@ We're using a flask app to hand off labels and audio between the front-end inter
 Audio is passed from the local machine to the flask app, where the model processes the audio and assigns text labels to the track. These text labels are then passed back to the front-end and displayed on the end user's web page.
 
 ## Model
-Big picture, our model consists of three main parts: a mel spectrogram, a pre-trained, convolutional audio embedding model, and a neural network classifier.
+Big picture, our model consists of three main parts: a mel spectrogram, a pre-trained, convolutional audio embedding model, and a neural network classifier. Source code for all things deep learning [here](https://github.com/hugofloresgarcia/instrument-recognition).
 
 ### Input Representation
 
@@ -93,12 +93,71 @@ where `num_output_units` refers to the number of classes in out dataset.
 
 We use batch normalization, dropout, and ReLU activations, as well as a Softmax in the output (not pictured above because it's included in our loss function).
 
-### Datasets
-We used the [MedleyDB](https://https://github.com/marl/medleydb) dataset for our experiments. The MedleyDB dataset is a multitrack dataset with 122 mixtures of real-life audio recodings of musical instruments and vocals, each with their corresponding stems. We use the [MedleyDB](https://https://github.com/marl/medleydb) artist conditional split function, and split our dataset into 85% train, 15% validation. We remove all classes not present in the validation set, and end
+### Train
+
+#### MedleyDB
+We used the [MedleyDB](https://https://github.com/marl/medleydb) dataset for our experiments. The MedleyDB dataset is a multitrack dataset with 122 mixtures of real-life audio recodings of musical instruments and vocals, each with their corresponding stems. We use the [MedleyDB](https://https://github.com/marl/medleydb) artist conditional split function, and split our dataset into 85% train, 15% validation. We remove all classes not present in the validation set, and end up with a 20 instrument dataset.
+
+#### Augmentation
+Before adding effects to each separate audio clip, we remove all silent regions from each audio stem and split the stems into 1 second segments, with a hop size of 250ms. After chunking our data into 1 second segments, we end up with 288k training samples and 56k validation samples.
+
+We preprocess our chunks with random amounts of the following effects (using [pysox](https://github.com/rabitt/pysox): EQ (up to 5 bandpass filters, low pass and high pass filtering), pitch shifting, time stretching, overdrive, flanger and compression.
+
 
 ### Training
+Here's our set of training hyperparameters:
+
+- number of epochs: 100
+- batch size: 512
+- learning rate: 0.0003, then 0.00003 (after 50 epochs), then 0.000003 (after 75 epochs)
+- loss: weighted cross entropy.
+- optimizer: Adam
 
 
-### Mixup Experiment
+#### Mixup experiment
+Since our dataset does not cover every musical instrument that may appear in an audio production scenario, we must deal with out-of-distribution data without making overconfident predictions and potentially worsening the user experience for visually-impaired users by introducing erroneous information that they may have to manually correct.
 
+Deep learning models trained with only one-hot encoded labels are likely to make low-entropy predictions regardless of the classifier’s true uncertainty, or whether the provided input lied within the training distribution or not. [Thulasidasan et. al](https://arxiv.org/pdf/1905.11001.pdf) find that models trained using mixup exhibit significantly better calibration properties for both in and out of distribution data when compared to models trained using regular cross entropy, under the argument that mixup provides a form of entropic regularization on the training signals.
 
+To improve the predictive uncertainty of our model, we conduct an experiment using varying degrees of mixup, and observe its effect on the model's calibration.
+
+#### An overview on mixup
+Mixup training is a recently proposed method for training neural networks on classification tasks that consists of convexly combining inputs and targets in the network. That is, for randomly sampled training examples `(x1, y1)` and `(x2, y2)` we generate new training examples through linear interpolation:
+
+```python
+def mixup(x1, y1, x2, y2, alpha):
+    # sample lambda from a beta distribution
+    lambda = beta(alpha, alpha)
+
+    mixed_x = lambda * x1 + (1 - lambda) * x2
+    mixed_y = lambda * y1 + (1 - lambda) * y2
+    return mixed_x, mixed_y
+```
+
+Where lambda is a linear interpolator drawn from a symmetric Beta distribution, and `alpha` is a hyperparameter controlling the strength of the convex combination. That is, smaller values of `alpha` approach the base case, where only one of the training examples is considered, while larger values of `alpha` result in more even combinations of the training examples. 
+
+#### Experiment setup
+
+We evaluate the effect of mixup training on the predictive
+uncertainty and classification performance of our models. We train model variants with varying degrees of alpha ∈
+{0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7}, where alpha = 0 is the baseline case, with no degree of interpolation between training
+samples. We do mixup at the embedding level.
+
+#### Metrics
+
+We evaluate our models with two metrics: micro-averaged F1 score and expected calibration error (ECE).
+
+#### Results
+
+**Effect of Mixup on the Expected Calibration Error** *(lower is better)*
+![plot of mixup alpha vs ece](./images/ece-test.png)
+
+**Effect of Mixup on F1 score** *(higher is better*)
+![plot of mixup alpha vs f1](./images/f1-test.png)
+
+The model with `alpha = 0.4` achieves both the highest F1 score and lowest ECE. Additionaly, notice that F1 score drops with high `alpha`. We believe this is due to underfitting.
+
+**Reliability Diagram**
+![reliability diagram](./images/reliability-plot.png)
+
+The reliability diagram plots accuracy vs confidence for test set predictions. A model with perfect calibration will be as accuracte as it is confident, and would be visualized as the `y=x` line in our reliability plot.
