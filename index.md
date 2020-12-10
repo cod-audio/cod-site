@@ -134,7 +134,7 @@ def mixup(x1, y1, x2, y2, alpha):
     return mixed_x, mixed_y
 ```
 
-Where lambda is a linear interpolator drawn from a symmetric Beta distribution, and `alpha` is a hyperparameter controlling the strength of the convex combination. That is, smaller values of `alpha` approach the base case, where only one of the training examples is considered, while larger values of `alpha` result in more even combinations of the training examples. 
+Where lambda is a linear interpolator drawn from a symmetric Beta distribution, and `alpha` is a hyperparameter controlling the strength of the convex combination. That is, smaller values of `alpha` approach the base case, where only one of the training examples is considered, while larger values of `alpha` result in more even combinations of the training examples.
 
 #### Experiment setup
 
