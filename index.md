@@ -1,6 +1,6 @@
 ---
 title: COD Instrument Labeler
-description: Cooper Barth, Hugo Flores Garcia, Jack Wiig
+description: Cooper Barth, Hugo Flores García, Jack Wiig
 ---
 
 ## About
@@ -27,6 +27,13 @@ The imported/generated labels are placed at their onset (start) time and the pla
 The goal of the interface is to emulate the track list of a DAW. Currently, there is only support for one track. To reset the interface, simply refresh the page and load a new track.
 
 The interface was created using React.
+
+## Backend
+[View the Source](https://github.com/cod-audio/cod-api)
+
+We're using a flask app to hand off labels and audio between the front-end interface and the machine learning model that powers the automatic labeler. Our app is hosted on [Heroku](https://www.heroku.com).
+
+Audio is passed from the local machine to the flask app, where the model processes the audio and assigns text labels to the track. These text labels are then passed back to the front-end and displayed on the end user's web page.
 
 ## Model
 Big picture, our model consists of three main parts: a mel spectrogram, a pre-trained, convolutional audio embedding model, and a neural network classifier.
@@ -95,6 +102,3 @@ We used the [MedleyDB](https://https://github.com/marl/medleydb) dataset for our
 ### Mixup Experiment
 
 
-
-## Backend
-[View the Source](https://github.com/cod-audio/cod-api)
