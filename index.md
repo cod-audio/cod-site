@@ -29,7 +29,7 @@ The goal of the interface is to emulate the track list of a DAW. Currently, ther
 The interface was created using React.
 
 ## Model
-Big picture, our model consists of three main parts: a mel spectrogram, a pre-trained, convolutional audio embedding model, and a neural network classifier.
+Big picture, our model consists of three main parts: a mel spectrogram, a pre-trained, convolutional audio embedding model, and a neural network classifier. Source code for all things deep learning [here](https://github.com/hugofloresgarcia/instrument-recognition). 
 
 ### Input Representation
 
