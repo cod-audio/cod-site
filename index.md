@@ -1,25 +1,41 @@
 ---
-title: Continuous Object Detector
+title: COD Instrument Labeler
 description: Cooper Barth, Hugo Flores Garcia, Jack Wiig
 ---
 
 ## About
-Continuous Object Detector (C.O.D.) is a tool designed to help audio engineers with visual impairments to more quickly get to locations within tracks that they are trying to find.
+The COD Instrument Labeler is a tool designed to show how digital audio workstations can be improved to help audio engineers with vision impairments navigate through their tracks more easily.
 
-## Motivation 
+Our solution is a web interface that allows an end user to upload a track and have it labeled in the graphical interface by pressing "Generate Labels". Manual labels, playback, and moving the playhead are also possible.
 
+## Motivation
+A common problem that occurs in the audio engineering workflow is having to process many tracks at once. Consider a day of heavy recording at the studio: When you get back, you'll have to import the 80 or so tracks that you've recorded and manually comb through them to apply labels and figure out what's what. This process can take painstakingly long, but using the latest technology in sound event detection (SED) machine learning research makes the task fully automatable.
+
+We created a proof of concept design that is intended to simulate the experience we hope to bring to a digital audio workstation (DAW). Digital audio workstations are the state of the art audio editing and creation tools. Notable examples include Logic Pro, Pro Tools, Ableton, FL Studio, Reaper, etc.
+
+Our solution provides labels for tracks with precision of one second. Not only that, we added custom navigation features that allow us to more easily move between labels with the same name, such as a "Piano" label at 5 seconds to a "Piano" label at 15 seconds. These labels are screenreader friendly and tested with NVDA on Windows and VoiceOver on macOS.
 
 ## Interface
+[Try it Out](https://cod-audio.github.io/cod/) | [View the Source](https://github.com/cod-audio/cod)
 
+A screenshot of the interface is visible below. The demo website contains information on how to use the interface, including special navigation commands to move between the labels. It has been tested on Safari and Chrome.
+
+![Labeled Track](images/labeled-track.png)
+
+The imported/generated labels are placed at their onset (start) time and the playhead (black upside down triangle) can be used to move around the track. At the bottom of the screen is a play/plause button. There are several navigation controls listed on the website that can be used to move about the labels more easily. Our current implementation also supports adding manual labels.
+
+The goal of the interface is to emulate the track list of a DAW. Currently, there is only support for one track. To reset the interface, simply refresh the page and load a new track.
+
+The interface was created using React.
 
 ## Model
-Big picture, our model consists of three main parts: a mel spectrogram, a pre-trained, convolutional audio embedding model, and a neural network classifier. 
+Big picture, our model consists of three main parts: a mel spectrogram, a pre-trained, convolutional audio embedding model, and a neural network classifier.
 
 ### Input Representation
 
 We use a 128-bin Mel Spectrogram of 1 second of audio as our input. Here are some hyperparameters:
 
-- 48kHz audio goes through a log-mel spectrogram. 
+- 48kHz audio goes through a log-mel spectrogram.
     - This means that the highest frequency we can represent is 24kHz (one half of the sample rate). This is well above the range of human hearing (around 18-20kHz)
 
 - Mel Spectrogram hyperparameters:
@@ -29,20 +45,20 @@ We use a 128-bin Mel Spectrogram of 1 second of audio as our input. Here are som
     - FFT hop size: 242 samples (5ms)
 
 
-### Embedding 
-We use the audio subnetwork of the [L3-net](https://github.com/marl/openl3) architecture for our embedding model. The weights are initialied to the mel128, music model variant. 
+### Embedding
+We use the audio subnetwork of the [L3-net](https://github.com/marl/openl3) architecture for our embedding model. The weights are initialied to the mel128, music model variant.
 
-*Note*: depending on the kernel size of the last maxpool layer, you have two different embedding sizes to choose from: 
+*Note*: depending on the kernel size of the last maxpool layer, you have two different embedding sizes to choose from:
 
 - With a maxpool kernel of (16, 24), your output embedding is size 512
 - With a maxpool kernel of (4, 8), your output embedding is size 6144
 
-We found during preliminary testing that using an embedding size of 6144 worked best in our case. 
+We found during preliminary testing that using an embedding size of 6144 worked best in our case.
 
 ### Classifier
-We use fully connected layers with ReLU activations for our classifier. Because PyTorch code is super readable, here's a code snippet with out model architecture. 
+We use fully connected layers with ReLU activations for our classifier. Because PyTorch code is super readable, here's a code snippet with out model architecture.
 
-```
+```python
 class MLP6144(pl.LightningModule):
 
     def __init__(self, dropout, num_output_units):
@@ -50,14 +66,14 @@ class MLP6144(pl.LightningModule):
 
         self.fc = nn.Sequential(
             nn.BatchNorm1d(6144),
-            nn.Linear(6144, 512), 
-            nn.ReLU(), 
-            nn.Dropout(dropout), 
+            nn.Linear(6144, 512),
+            nn.ReLU(),
+            nn.Dropout(dropout),
 
             nn.BatchNorm1d(512),
-            nn.Linear(512, 128), 
-            nn.ReLU(), 
-            nn.Dropout(dropout), 
+            nn.Linear(512, 128),
+            nn.ReLU(),
+            nn.Dropout(dropout),
 
             nn.BatchNorm1d(128),
             nn.Linear(128, num_output_units))
@@ -142,3 +158,4 @@ The reliability diagram plots accuracy vs confidence for test set predictions. A
 Notice how the baseline model acts with high overconfidence when its accuracy exceeds 25%. As the degree of mixup increases, the reliability line approaches the `y=x`, indicating that mixup does effectively improve the predictive uncertainty of our model. 
 
 ## Backend
+[View the Source](https://github.com/cod-audio/cod-api)
