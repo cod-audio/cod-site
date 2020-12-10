@@ -37,6 +37,7 @@ Audio is passed from the local machine to the flask app, where the model process
 
 ## Model
 [View the Source](https://github.com/hugofloresgarcia/instrument-recognition)
+
 Big picture, our model consists of three main parts: a mel spectrogram, a pre-trained, convolutional audio embedding model, and a neural network classifier.
 
 ### Input Representation
