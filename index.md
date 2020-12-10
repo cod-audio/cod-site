@@ -1,7 +1,3 @@
----
-title: Continuous Object Detector
-description: Cooper Barth, Hugo Flores Garcia, Jack Wiig
----
 ## Welcome to GitHub Pages
 
 You can use the [editor on GitHub](https://github.com/cod-audio/cod-site/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
