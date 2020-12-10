@@ -117,7 +117,7 @@ To improve the predictive uncertainty of our model, we conduct an experiment usi
 #### an overview on mixup
 Mixup training is a recently proposed method for training neural networks on classification tasks that consists of convexly combining inputs and targets in the network. That is, for randomly sampled training examples `(x1, y1)` and `(x2, y2)` we generate new training examples through linear interpolation:
 
-```
+```python
 def mixup(x1, y1, x2, y2, alpha):
     # sample lambda from a beta distribution
     lambda = beta(alpha, alpha)
