@@ -1,4 +1,6 @@
 theme: jekyll-theme-cayman
+title: Continuous Object Detector
+description: Cooper Barth, Hugo Flores Garcia, Jack Wiig
 github:
   repository_url: https://github.com/cod-audio
 demo_url: https://cod-audio.github.io/cod/
