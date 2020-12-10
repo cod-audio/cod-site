@@ -67,5 +67,14 @@ where `num_output_units` refers to the number of classes in out dataset.
 
 We use batch normalization, dropout, and ReLU activations, as well as a Softmax in the output (not pictured above because it's included in our loss function).
 
+### Datasets
+We used the [MedleyDB](https://https://github.com/marl/medleydb) dataset for our experiments. The MedleyDB dataset is a multitrack dataset with 122 mixtures of real-life audio recodings of musical instruments and vocals, each with their corresponding stems. We use the [MedleyDB](https://https://github.com/marl/medleydb) artist conditional split function, and split our dataset into 85% train, 15% validation. We remove all classes not present in the validation set, and end
+
+### Training
+
+
+### Mixup Experiment
+
+
 
 ## Backend
