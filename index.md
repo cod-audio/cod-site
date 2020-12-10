@@ -36,7 +36,8 @@ We're using a flask app to hand off labels and audio between the front-end inter
 Audio is passed from the local machine to the flask app, where the model processes the audio and assigns text labels to the track. These text labels are then passed back to the front-end and displayed on the end user's web page.
 
 ## Model
-Big picture, our model consists of three main parts: a mel spectrogram, a pre-trained, convolutional audio embedding model, and a neural network classifier. Source code for all things deep learning [here](https://github.com/hugofloresgarcia/instrument-recognition).
+[View the Source](https://github.com/hugofloresgarcia/instrument-recognition)
+Big picture, our model consists of three main parts: a mel spectrogram, a pre-trained, convolutional audio embedding model, and a neural network classifier.
 
 ### Input Representation
 
