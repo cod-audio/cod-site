@@ -12,6 +12,9 @@ We created a proof of concept that is intended to simulate the experience we hop
 
 Our solution provides labels for tracks with precision of one second. Not only that, we added custom navigation features that allow us to more easily move between labels with the same name, such as a "Piano" label at 5 seconds to a "Piano" label at 15 seconds. These labels are screenreader friendly and tested with NVDA on Windows and VoiceOver on macOS.
 
+## Motivation 
+
+
 ## Interface
 [Try it out](https://cod-audio.github.io/cod/) | [View the Source](https://github.com/cod-audio/cod)
 
@@ -24,6 +27,71 @@ The goal of the interface is to emulate the track list of a DAW. Currently, ther
 The interface was created using React.
 
 ## Model
+Big picture, our model consists of three main parts: a mel spectrogram, a pre-trained, convolutional audio embedding model, and a neural network classifier. 
+
+### Input Representation
+
+We use a 128-bin Mel Spectrogram of 1 second of audio as our input. Here are some hyperparameters:
+
+- 48kHz audio goes through a log-mel spectrogram. 
+    - This means that the highest frequency we can represent is 24kHz (one half of the sample rate). This is well above the range of human hearing (around 18-20kHz)
+
+- Mel Spectrogram hyperparameters:
+    - Number of Mel frequency bins: 128
+    - Magnitude representation (not power)
+    - FFT window size: 2048 samples (42.67ms)
+    - FFT hop size: 242 samples (5ms)
+
+
+### Embedding 
+We use the audio subnetwork of the [L3-net](https://github.com/marl/openl3) architecture for our embedding model. The weights are initialied to the mel128, music model variant. 
+
+*Note*: depending on the kernel size of the last maxpool layer, you have two different embedding sizes to choose from: 
+
+- With a maxpool kernel of (16, 24), your output embedding is size 512
+- With a maxpool kernel of (4, 8), your output embedding is size 6144
+
+We found during preliminary testing that using an embedding size of 6144 worked best in our case. 
+
+### Classifier
+We use fully connected layers with ReLU activations for our classifier. Because PyTorch code is super readable, here's a code snippet with out model architecture. 
+
+```
+class MLP6144(pl.LightningModule):
+
+    def __init__(self, dropout, num_output_units):
+        super().__init__()
+
+        self.fc = nn.Sequential(
+            nn.BatchNorm1d(6144),
+            nn.Linear(6144, 512), 
+            nn.ReLU(), 
+            nn.Dropout(dropout), 
+
+            nn.BatchNorm1d(512),
+            nn.Linear(512, 128), 
+            nn.ReLU(), 
+            nn.Dropout(dropout), 
+
+            nn.BatchNorm1d(128),
+            nn.Linear(128, num_output_units))
+
+    def forward(self, x):
+        return self.fc(x)
+```
+
+where `num_output_units` refers to the number of classes in out dataset.
+
+We use batch normalization, dropout, and ReLU activations, as well as a Softmax in the output (not pictured above because it's included in our loss function).
+
+### Datasets
+We used the [MedleyDB](https://https://github.com/marl/medleydb) dataset for our experiments. The MedleyDB dataset is a multitrack dataset with 122 mixtures of real-life audio recodings of musical instruments and vocals, each with their corresponding stems. We use the [MedleyDB](https://https://github.com/marl/medleydb) artist conditional split function, and split our dataset into 85% train, 15% validation. We remove all classes not present in the validation set, and end
+
+### Training
+
+
+### Mixup Experiment
+
 
 
 ## Backend
