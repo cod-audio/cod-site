@@ -6,14 +6,38 @@ description: Cooper Barth, Hugo Flores García, Jack Wiig
 ## About
 The COD Instrument Labeler is a tool designed to show how digital audio workstations can be improved to help audio engineers with vision impairments navigate through their tracks more easily.
 
-Our solution is a web interface that allows an end user to upload a track and have it labeled in the graphical interface by pressing "Generate Labels". Manual labels, playback, and moving the playhead are also possible.
+Our solution is a web interface that allows an end user to upload a track and have it automatically labeled in the graphical interface by pressing "Generate Labels". The website will label each second of audio in the track and display those to the user in the labels section.
 
 ## Motivation
 A common problem that occurs in the audio engineering workflow is having to process many tracks at once. Consider a day of heavy recording at the studio: When you get back, you'll have to import the 80 or so tracks that you've recorded and manually comb through them to apply labels and figure out what's what. This process can take painstakingly long, but using the latest technology in sound event detection (SED) machine learning research makes the task fully automatable.
 
+## Overview
 We created a proof of concept design that is intended to simulate the experience we hope to bring to a digital audio workstation (DAW). Digital audio workstations are the state of the art audio editing and creation tools. Notable examples include Logic Pro, Pro Tools, Ableton, FL Studio, Reaper, etc.
 
-Our solution provides labels for tracks with precision of one second. Not only that, we added custom navigation features that allow us to more easily move between labels with the same name, such as a "Piano" label at 5 seconds to a "Piano" label at 15 seconds. These labels are screenreader friendly and tested with NVDA on Windows and VoiceOver on macOS.
+Our solution provides a label for each second of audio in the track, coalesced. Not only that, we added custom navigation features that allow us to more easily move between labels with the same name, such as a "Piano" label at 5 seconds to a "Piano" label at 15 seconds. These labels are screenreader friendly and tested with NVDA on Windows and VoiceOver on macOS. We also provided manual labeling, playback, and a movable playhead to simulate the basic functionality of a DAW.
+
+Currently, we are recognizing the following types of sounds:
+
+- acoustic guitar
+- auxiliary percussion
+- brass section
+- cello
+- clean electric guitar
+- distorted electric guitar
+- double bass
+- drum set
+- electric bass
+- female singer
+- male singer
+- oboe
+- piano
+- synthesizer
+- tack piano
+- trumpet
+- vibraphone
+- viola
+- violin
+- vocalists
 
 ## Interface
 [Try It Out](https://cod-audio.github.io/cod/) | [View the Source](https://github.com/cod-audio/cod)
