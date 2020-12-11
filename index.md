@@ -170,12 +170,12 @@ We evaluate the effect of mixup training on the predictive uncertainty and class
 
 #### Metrics
 
-We evaluate our models with two metrics: micro-averaged F1 score and expected calibration error (ECE).
+We evaluate our models with two metrics: **micro-averaged F1 score** and **expected calibration error (ECE)**.
 
-**F1 Score**
-The F1 score is a more preferable classification metric than accuracy because it takes dataset imbalance into account. We assume the reader is familiar with the definition of F1 score. 
+**F1 Score**: The F1 score is a more preferable classification metric than accuracy because it takes dataset imbalance into account. We assume the reader is familiar with the definition of F1 score. 
 
 **Expected Calibration Error (ECE)**
+
 We use ECE as a scalar metric indicative of our model's predictive uncertainty. 
 
 The ECE of a classifier is defined as the expected difference between classifier's confidence and prediction accuracy. That is, a perfectly calibrated model with an accuracy of 70% for a set of predictions will have an average confidence of 70%. This is much more preferable than an overconfident model that is only 70% accurate but has an average confidence of 90%. 
