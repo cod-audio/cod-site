@@ -16,7 +16,7 @@ We created a proof of concept design that is intended to simulate the experience
 Our solution provides labels for tracks with precision of one second. Not only that, we added custom navigation features that allow us to more easily move between labels with the same name, such as a "Piano" label at 5 seconds to a "Piano" label at 15 seconds. These labels are screenreader friendly and tested with NVDA on Windows and VoiceOver on macOS.
 
 ## Interface
-[Try it Out](https://cod-audio.github.io/cod/) | [View the Source](https://github.com/cod-audio/cod)
+[Try It Out](https://cod-audio.github.io/cod/) | [View the Source](https://github.com/cod-audio/cod)
 
 A screenshot of the interface is visible below. The demo website contains information on how to use the interface, including special navigation commands to move between the labels. It has been tested on Safari and Chrome.
 
