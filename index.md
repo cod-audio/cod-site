@@ -178,7 +178,7 @@ We evaluate our models with two metrics: **micro-averaged F1 score** and **expec
 
 We use ECE as a scalar metric indicative of our model's predictive uncertainty. 
 
-The ECE of a classifier is defined as the expected difference between classifier's confidence and prediction accuracy. That is, a perfectly calibrated model with an accuracy of 70% for a set of predictions will have an average confidence of 70%. This is much more preferable than an overconfident model that is only 70% accurate but has an average confidence of 90%. 
+The ECE of a classifier is defined as the expected difference between classifier's confidence and prediction accuracy. That is, for a given set of predictions, a perfectly calibrated model with an accuracy of 70% will have an average confidence of 70%. This is much more preferable than an overconfident model that is only 70% accurate but has an average confidence of 90%. 
 
 To calculate the ECE of a set of predictions, we bin the set of predictions into `M` bins and calculate the weighted average of the difference between accuracy and confidence: 
 
@@ -189,7 +189,7 @@ where
 - acc(Bₘ) is the accuracy for the predictions in bin Bₘ
 - n is the total number of samples in all bins
 
-#### Results
+### Results
 
 **Effect of Mixup on the Expected Calibration Error** *(lower is better)*
 ![plot of mixup alpha vs ece](./images/ece-test.png)
@@ -202,7 +202,7 @@ The model with `alpha = 0.4` achieves both the highest F1 score and lowest ECE. 
 **Reliability Diagram**
 ![reliability diagram](./images/reliability-plot.png)
 
-The reliability diagram plots accuracy vs confidence for test set predictions. To create a reliability diagram, we split our test set predictions into M bins and calculate the accuracy and confidence for each bin. Then, we sort the bins by confidence (X axis) and plot the accuracy with respect to confidence for each bin. 
+The reliability diagram plots accuracy vs confidence for test set predictions. To create a reliability diagram, we split our test set predictions into M bins and calculate the **accuracy** and **average confidence** for each bin. Then, we sort the bins by confidence (X axis) and plot the accuracy with respect to confidence for each bin. 
 
 A model with perfect calibration will be as confident as it is accurate, and would be visualized as the `y=x` line in our reliability plot.
 
