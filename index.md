@@ -129,10 +129,10 @@ The 20 instruments we consider are: `acoustic guitar`,`auxiliary percussion`,`br
 #### Data Augmentation
 Before adding effects to each separate audio clip, we remove all silent regions from each audio stem and split the stems into 1 second segments, with a hop size of 250ms. After chunking our data into 1 second segments, we end up with 288k training samples and 56k validation samples.
 
-We preprocess our chunks with random amounts of the following effects (using [pysox](https://github.com/rabitt/pysox): EQ (up to 5 bandpass filters, low pass and high pass filtering), pitch shifting, time stretching, overdrive, flanger and compression.
+We preprocess our chunks with random amounts of the following effects (using [pysox](https://github.com/rabitt/pysox)): EQ (up to 5 bandpass filters, low pass and high pass filtering), pitch shifting, time stretching, overdrive, flanger and compression.
 
 
-### Hyperparameters
+#### Hyperparameters
 Here's our set of training hyperparameters:
 
 - number of epochs: 100
@@ -142,12 +142,12 @@ Here's our set of training hyperparameters:
 - optimizer: Adam
 
 
-#### Mixup experiment
+### Mixup experiment
 Since our dataset does not cover every musical instrument that may appear in an audio production scenario, we must deal with out-of-distribution data without making overconfident predictions and potentially worsening the user experience for visually-impaired users by introducing erroneous information that they may have to manually correct.
 
 Deep learning models trained with only one-hot encoded labels are likely to make low-entropy predictions regardless of the classifier’s true uncertainty, or whether the provided input lied within the training distribution or not. [Thulasidasan et. al](https://arxiv.org/pdf/1905.11001.pdf) find that models trained using mixup exhibit significantly better calibration properties for both in and out of distribution data when compared to models trained using regular cross entropy, under the argument that mixup provides a form of entropic regularization on the training signals.
 
-To improve the predictive uncertainty of our model, we conduct an experiment using varying degrees of mixup, and observe its effect on the model's calibration.
+To improve the predictive uncertainty of our model, we conduct an experiment using varying degrees of mixup, and observe its effect on the model's calibration, as well as classification performance.
 
 #### An overview on mixup
 Mixup training is a recently proposed method for training neural networks on classification tasks that consists of convexly combining inputs and targets in the network. That is, for randomly sampled training examples `(x1, y1)` and `(x2, y2)` we generate new training examples through linear interpolation:
@@ -155,14 +155,14 @@ Mixup training is a recently proposed method for training neural networks on cla
 ```python
 def mixup(x1, y1, x2, y2, alpha):
     # sample lambda from a beta distribution
-    lambda = beta(alpha, alpha)
+    lambda_ = beta(alpha, alpha)
 
-    mixed_x = lambda * x1 + (1 - lambda) * x2
-    mixed_y = lambda * y1 + (1 - lambda) * y2
+    mixed_x = lambda_ * x1 + (1 - lambda_) * x2
+    mixed_y = lambda_ * y1 + (1 - lambda_) * y2
     return mixed_x, mixed_y
 ```
 
-Where lambda is a linear interpolator drawn from a symmetric Beta distribution, and `alpha` is a hyperparameter controlling the strength of the convex combination. That is, smaller values of `alpha` approach the base case, where only one of the training examples is considered, while larger values of `alpha` result in more even combinations of the training examples.
+Where `lambda_` is a linear interpolator drawn from a symmetric Beta distribution, and `alpha` is a hyperparameter controlling the strength of the convex combination. That is, smaller values of `alpha` approach the base case, where only one of the training examples is considered, while larger values of `alpha` result in more even combinations of the training examples.
 
 #### Experiment setup
 
