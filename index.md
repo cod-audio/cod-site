@@ -142,22 +142,30 @@ Where lambda is a linear interpolator drawn from a symmetric Beta distribution, 
 
 #### Experiment setup
 
-We evaluate the effect of mixup training on the predictive
-uncertainty and classification performance of our models. We train model variants with varying degrees of alpha ∈
-{0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7}, where alpha = 0 is the baseline case, with no degree of interpolation between training
-samples. We do mixup at the embedding level.
+We evaluate the effect of mixup training on the predictive uncertainty and classification performance of our models. We train model variants with varying degrees of alpha ∈ {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7}, where alpha = 0 is the baseline case, with no degree of interpolation between training samples. We do mixup at the embedding level.
 
 #### Metrics
 
 We evaluate our models with two metrics: micro-averaged F1 score and expected calibration error (ECE).
 
+**F1 Score**
+The F1 score is a more preferable classification metric than accuracy because it takes dataset imbalance into account. We assume the reader is familiar with the definition of F1 score. 
+
+**Expected Calibration Error (ECE)**
+We use ECE as a scalar metric indicative of our model's predictive uncertainty. 
+
+The ECE of a classifier is defined as the expected difference between classifier's confidence and prediction accuracy. That is, a perfectly calibrated model with an accuracy of 70% for a set of predictions will have an average confidence of 70%. This is much more preferable than an overconfident model that is only 70% accurate but has an average confidence of 90%. 
+
+To calculate the ECE of a set of predictions, we bin the set of predictions into `M` bins and calculate the weighted average of the difference between accuracy and confidence: 
+
+![ece-definition](./images/ECE-def.png)
+
+where 
+- conf(Bₘ) if the average confidence of prediction in bin Bₘ 
+- acc(Bₘ) is the accuracy for the predictions in bin Bₘ
+- n is the total number of samples in all bins
+
 #### Results
-
-**Normalized Confusion Matrix**
-
-x axis represents predicted labels, while y axis represents true labels. 
-![normalized confusion matrix](./images/confusion-matrix.png)
-
 
 **Effect of Mixup on the Expected Calibration Error** *(lower is better)*
 ![plot of mixup alpha vs ece](./images/ece-test.png)
@@ -165,9 +173,18 @@ x axis represents predicted labels, while y axis represents true labels.
 **Effect of Mixup on F1 score** *(higher is better*)
 ![plot of mixup alpha vs f1](./images/f1-test.png)
 
-The model with `alpha = 0.4` achieves both the highest F1 score and lowest ECE. Additionaly, notice that F1 score drops with high `alpha`. We believe this is due to underfitting.
+The model with `alpha = 0.4` achieves both the highest F1 score and lowest ECE. We choose this model for our labeler. Additionaly, notice that F1 score drops with high `alpha`. We believe this is due to underfitting. 
 
 **Reliability Diagram**
 ![reliability diagram](./images/reliability-plot.png)
 
-The reliability diagram plots accuracy vs confidence for test set predictions. A model with perfect calibration will be as accuracte as it is confident, and would be visualized as the `y=x` line in our reliability plot.
+The reliability diagram plots accuracy vs confidence for test set predictions. To create a reliability diagram, we split our test set predictions into M bins and calculate the accuracy and confidence for each bin. Then, we sort the bins by confidence (X axis) and plot the accuracy with respect to confidence for each bin. 
+
+A model with perfect calibration will be as confident as it is accurate, and would be visualized as the `y=x` line in our reliability plot.
+
+**Normalized Confusion Matrix**
+
+Here is the normlized confusion matrix for our best model (`alpha` = 0.4):
+
+*x axis represents predicted labels, while y axis represents true labels.*
+![normalized confusion matrix](./images/norm-confusion-matrix.png)
