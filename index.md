@@ -95,18 +95,20 @@ where `num_output_units` refers to the number of classes in out dataset.
 
 We use batch normalization, dropout, and ReLU activations, as well as a Softmax in the output (not pictured above because it's included in our loss function).
 
-### Train
+### Training
 
-#### MedleyDB
-We used the [MedleyDB](https://https://github.com/marl/medleydb) dataset for our experiments. The MedleyDB dataset is a multitrack dataset with 122 mixtures of real-life audio recodings of musical instruments and vocals, each with their corresponding stems. We use the [MedleyDB](https://https://github.com/marl/medleydb) artist conditional split function, and split our dataset into 85% train, 15% validation. We remove all classes not present in the validation set, and end up with a 20 instrument dataset.
+#### Dataset
+We used the [MedleyDB](https://https://github.com/marl/medleydb) dataset for our experiments. The MedleyDB dataset is a multitrack dataset with 122 mixtures of real-life audio recodings of musical instruments and vocals, each with their corresponding stems. We use the [MedleyDB](https://https://github.com/marl/medleydb) artist conditional split function, and split our dataset into 85% train, 15% validation. We remove all classes not present in the validation set, and end up with a 20 instrument dataset. 
 
-#### Augmentation
+The 20 instruments we consider are: `acoustic guitar`,`auxiliary percussion`,`brass section`,`cello`,`clean electric guitar`,`distorted electric guitar`,`double bass`,`drum set`,`electric bass`,`female singer`,`male singer`,`oboe`,`piano`,`synthesizer`,`tack piano`,`trumpet`,`vibraphone`,`viola`,`violin`,`vocalists`. 
+
+#### Data Augmentation
 Before adding effects to each separate audio clip, we remove all silent regions from each audio stem and split the stems into 1 second segments, with a hop size of 250ms. After chunking our data into 1 second segments, we end up with 288k training samples and 56k validation samples.
 
 We preprocess our chunks with random amounts of the following effects (using [pysox](https://github.com/rabitt/pysox): EQ (up to 5 bandpass filters, low pass and high pass filtering), pitch shifting, time stretching, overdrive, flanger and compression.
 
 
-### Training
+### Hyperparameters
 Here's our set of training hyperparameters:
 
 - number of epochs: 100
@@ -150,6 +152,12 @@ samples. We do mixup at the embedding level.
 We evaluate our models with two metrics: micro-averaged F1 score and expected calibration error (ECE).
 
 #### Results
+
+**Normalized Confusion Matrix**
+
+x axis represents predicted labels, while y axis represents true labels. 
+![normalized confusion matrix](./images/confusion-matrix.png)
+
 
 **Effect of Mixup on the Expected Calibration Error** *(lower is better)*
 ![plot of mixup alpha vs ece](./images/ece-test.png)
